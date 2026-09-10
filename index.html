@@ -11,7 +11,9 @@
 <!-- LOGIN -->
 <div id="loginPage" class="flex items-center justify-center h-screen">
   <div class="bg-white p-8 rounded shadow-md w-96 text-center">
-    <img id="logoLogin" class="w-28 h-28 mx-auto mb-3 rounded-full border-4 border-red-500 bg-white p-2 object-contain">
+    <div class="w-28 h-28 mx-auto mb-3 rounded-full border-4 border-red-500 bg-teal-600 flex items-center justify-center">
+  <span class="text-white font-bold text-2xl">S</span>
+</div>
     <h2 class="text-2xl font-bold mb-1 text-teal-600">SIMAPEL</h2>
     <p class="text-sm mb-4 text-gray-500">SMP IT Mutiara Hikmah</p>
     <p id="statusLoad" class="text-center text-sm text-blue-500 mb-4">Sedang ambil data...</p>
@@ -27,7 +29,9 @@
 <div id="mainApp" class="hidden flex-col min-h-screen">
   <div class="bg-teal-600 text-white p-4 flex justify-between items-center">
     <div class="flex items-center gap-3">
-      <img id="logoHeader" class="w-14 h-14 rounded-full bg-white p-1 border-2 border-red-400 object-contain">
+      <div class="w-14 h-14 rounded-full bg-white p-1 border-2 border-red-400 flex items-center justify-center">
+  <span class="text-teal-600 font-bold text-xl">S</span>
+</div>
       <div>
         <h1 class="text-xl font-bold">SIMAPEL</h1>
         <p class="text-sm">SMP IT Mutiara Hikmah</p>
@@ -127,7 +131,7 @@
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8WIeWzSP2eurGnzqct3oDoA5gw1RM23eDpiqGxy4FxvVF_asCiu9X2DWSZ4Er3GDQ/exec"; // WAJIB GANTI
-const LOGO_URL = "https://i.ibb.co/Hp7zQNB0/LOGO-MHI.jpg"; // HAPUS .com nya
+const LOGO_URL = ""; // KOSONGKAN DULU
 const NAMA_PEMBUAT = "Adhien Costa"; // <-- GANTI INI
 
 let db = {siswa:[], guru:[], kelas:[], nilai:[], absensi:[], users:[], pelanggaran:[]};
