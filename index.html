@@ -126,7 +126,7 @@
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRheOnjZpDfPvhZ3oICHLThmK8RXR1paxORzNfNSIlgl7QkvS_fOeFCkDkimlzr_2X/exec"; // WAJIB GANTI
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqxFC1H-oYRDElRa755XAlV_RlfLciZ0hATdh1R3YqItnoXYTj-69RodoaKaECtQGw/exec"; // WAJIB GANTI
 const LOGO_URL = "https://i.ibb.co.com/Hp7zQNB0/LOGO-MHI.jpg"; // <-- GANTI INI
 const NAMA_PEMBUAT = "Adhien Costa"; // <-- GANTI INI
 
@@ -143,16 +143,19 @@ window.onload = async function(){
 }
 
 async function loadFromGSheet(){
-  try{ 
-    let res = await fetch(SCRIPT_URL + "?action=getAll"); 
-    let text = await res.text();
-    db = JSON.parse(text); 
-    statusLoad.innerText = "Data siap. Silakan login";
-  }
-  catch(err){ 
-    console.log(err);
-    statusLoad.innerText = "Gagal ambil data. Cek Deploy Appscript ke Anyone"; 
-  }
+  return new Promise((resolve) => {
+    let callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+    window[callbackName] = function(data) {
+      db = data;
+      statusLoad.innerText = "Data siap. Silakan login";
+      delete window[callbackName];
+      script.remove();
+      resolve();
+    };
+    let script = document.createElement('script');
+    script.src = SCRIPT_URL + "?callback=" + callbackName;
+    document.body.appendChild(script);
+  });
 }
 function login(){
   let u = username.value; let p = password.value;
@@ -201,7 +204,13 @@ function renderStatistik(){
   if(chart) chart.destroy();
   chart = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(dataChart), datasets:[{label:'Jumlah', data:Object.values(dataChart), backgroundColor:'red'}] } });
 }
-async function syncToGoogleSheet(){ let payload = ['kelas','siswa','guru','nilai','absensi','users','pelanggaran'].map(t => ({type:t, data:db[t]})); for(let p of payload){ await fetch(SCRIPT_URL, {method:"POST", mode:"no-cors", body:JSON.stringify(p)}); } alert("Upload Selesai!"); }
+async function syncToGoogleSheet(){ 
+  let payload = ['kelas','siswa','guru','nilai','absensi','users','pelanggaran'].map(t => ({type:t, data:db[t]})); 
+  for(let p of payload){ 
+    await fetch(SCRIPT_URL, {method:"POST", mode:"no-cors", body:JSON.stringify(p)}); 
+  } 
+  alert("Upload Selesai!"); 
+}
 function exportData(){ let a = document.createElement('a'); a.href = "data:text/json," + encodeURIComponent(JSON.stringify(db)); a.download = "backup.json"; a.click(); }
 function importData(event){ let file = event.target.files[0]; let reader = new FileReader(); reader.onload = function(e){ db = JSON.parse(e.target.result); alert("Import Berhasil!"); } reader.readAsText(file); }
 function logout(){ location.reload(); }
