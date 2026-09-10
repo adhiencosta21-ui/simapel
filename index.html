@@ -126,7 +126,7 @@
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqxFC1H-oYRDElRa755XAlV_RlfLciZ0hATdh1R3YqItnoXYTj-69RodoaKaECtQGw/exec"; // WAJIB GANTI
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8WIeWzSP2eurGnzqct3oDoA5gw1RM23eDpiqGxy4FxvVF_asCiu9X2DWSZ4Er3GDQ/exec"; // WAJIB GANTI
 const LOGO_URL = "https://i.ibb.co.com/Hp7zQNB0/LOGO-MHI.jpg"; // <-- GANTI INI
 const NAMA_PEMBUAT = "Adhien Costa"; // <-- GANTI INI
 
@@ -214,6 +214,7 @@ async function syncToGoogleSheet(){
 function exportData(){ let a = document.createElement('a'); a.href = "data:text/json," + encodeURIComponent(JSON.stringify(db)); a.download = "backup.json"; a.click(); }
 function importData(event){ let file = event.target.files[0]; let reader = new FileReader(); reader.onload = function(e){ db = JSON.parse(e.target.result); alert("Import Berhasil!"); } reader.readAsText(file); }
 function logout(){ location.reload(); }
+function showUserModal(){ alert("Edit user di Google Sheet tab 'users' ya pak"); }
 </script>
 </body>
 </html>
