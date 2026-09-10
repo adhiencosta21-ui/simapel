@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>SIMAPEL V3.0</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+
+<!-- LOGIN -->
+<div id="loginPage" class="flex items-center justify-center h-screen">
+  <div class="bg-white p-8 rounded shadow-md w-96 text-center">
+    <img id="logoLogin" class="w-28 h-28 mx-auto mb-3 rounded-full border-4 border-red-500 bg-white p-2 object-contain">
+    <h2 class="text-2xl font-bold mb-1 text-teal-600">SIMAPEL</h2>
+    <p class="text-sm mb-4 text-gray-500">SMP IT Mutiara Hikmah</p>
+    <p id="statusLoad" class="text-center text-sm text-blue-500 mb-4">Sedang ambil data...</p>
+    <input id="username" type="text" placeholder="Username" class="w-full p-2 border rounded mb-3">
+    <input id="password" type="password" placeholder="Password" class="w-full p-2 border rounded mb-4">
+    <button onclick="login()" class="bg-teal-600 text-white p-2 rounded w-full">Login</button>
+    <p id="loginError" class="text-red-500 text-sm mt-2"></p>
+    <p id="namaPembuatLogin" class="text-xs text-gray-400 mt-4"></p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="hidden flex-col min-h-screen">
+  <div class="bg-teal-600 text-white p-4 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <img id="logoHeader" class="w-14 h-14 rounded-full bg-white p-1 border-2 border-red-400 object-contain">
+      <div>
+        <h1 class="text-xl font-bold">SIMAPEL</h1>
+        <p class="text-sm">SMP IT Mutiara Hikmah</p>
+      </div>
+    </div>
+    <p id="userInfo"></p>
+  </div>
+
+  <div class="bg-white p-2 flex gap-2 flex-wrap shadow sticky top-0">
+    <button onclick="showTab('dashboard')" class="px-3 py-1 rounded hover:bg-gray-200">Dashboard</button>
+    <button onclick="showTab('statistik')" class="px-3 py-1 rounded hover:bg-indigo-100">Statistik</button>
+    <button onclick="showTab('kelas')" class="px-3 py-1 rounded hover:bg-gray-200">Kelas</button>
+    <button onclick="showTab('siswa')" class="px-3 py-1 rounded hover:bg-gray-200">Siswa</button>
+    <button onclick="showTab('guru')" class="px-3 py-1 rounded hover:bg-gray-200">Guru</button>
+    <button onclick="showTab('nilai')" class="px-3 py-1 rounded hover:bg-gray-200">Nilai</button>
+    <button onclick="showTab('absensi')" class="px-3 py-1 rounded hover:bg-gray-200">Absensi</button>
+    <button onclick="showTab('pelanggaran')" class="px-3 py-1 rounded hover:bg-gray-200">Pelanggaran</button>
+    <button id="btnKelolaUser" onclick="showUserModal()" class="bg-blue-500 text-white px-3 py-1 rounded hidden">Kelola User</button>
+    <button onclick="exportData()" class="bg-yellow-500 text-white px-3 py-1 rounded">Export</button>
+    <input type="file" id="importFile" class="hidden" onchange="importData(event)">
+    <button onclick="document.getElementById('importFile').click()" class="bg-orange-500 text-white px-3 py-1 rounded">Import</button>
+    <button onclick="syncToGoogleSheet()" class="bg-green-500 text-white px-3 py-1 rounded">Upload</button>
+    <button onclick="logout()" class="bg-red-500 text-white px-3 py-1 rounded">Logout</button>
+  </div>
+
+  <div class="flex-1 p-4">
+    <!-- DASHBOARD -->
+    <div id="tab-dashboard" class="tab bg-white p-4 rounded shadow">
+      <h2 class="font-bold text-lg mb-2">Dashboard</h2>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="bg-teal-100 p-4 rounded">Total Siswa: <b id="totalSiswa">0</b></div>
+        <div class="bg-blue-100 p-4 rounded">Total Guru: <b id="totalGuru">0</b></div>
+        <div class="bg-green-100 p-4 rounded">Total Kelas: <b id="totalKelas">0</b></div>
+      </div>
+    </div>
+
+    <!-- STATISTIK -->
+    <div id="tab-statistik" class="tab hidden bg-white p-4 rounded shadow">
+      <h2 class="font-bold text-lg mb-2">Statistik Pelanggaran</h2>
+      <canvas id="chartPelanggaran"></canvas>
+    </div>
+
+    <!-- FORM KELAS MANUAL BALIK -->
+    <div id="tab-kelas" class="tab hidden bg-white p-4 rounded shadow">
+      <h2 class="font-bold mb-2">Data Kelas - Input Manual</h2>
+      <div class="flex gap-2 mb-3">
+        <input id="kodeKelas" placeholder="Kode Kelas: 7A" class="p-2 border rounded flex-1">
+        <input id="waliKelas" placeholder="Wali Kelas" class="p-2 border rounded flex-1">
+        <button onclick="simpanKelas()" class="bg-teal-600 text-white px-4 py-2 rounded">Simpan</button>
+      </div>
+      <div id="listKelas" class="mt-2"></div>
+    </div>
+
+    <!-- FORM SISWA MANUAL BALIK -->
+    <div id="tab-siswa" class="tab hidden bg-white p-4 rounded shadow">
+      <h2 class="font-bold mb-2">Data Siswa - Input Manual</h2>
+      <div class="flex gap-2 mb-3 flex-wrap">
+        <input id="nis" placeholder="NIS" class="p-2 border rounded">
+        <input id="namaSiswa" placeholder="Nama Siswa" class="p-2 border rounded">
+        <input id="kelasSiswa" placeholder="Kelas: 7A" class="p-2 border rounded">
+        <button onclick="simpanSiswa()" class="bg-teal-600 text-white px-4 py-2 rounded">Simpan</button>
+      </div>
+      <div id="listSiswa" class="mt-2"></div>
+    </div>
+
+    <!-- FORM GURU MANUAL BALIK -->
+    <div id="tab-guru" class="tab hidden bg-white p-4 rounded shadow">
+      <h2 class="font-bold mb-2">Data Guru - Input Manual</h2>
+      <div class="flex gap-2 mb-3 flex-wrap">
+        <input id="nip" placeholder="NIP" class="p-2 border rounded">
+        <input id="namaGuru" placeholder="Nama Guru" class="p-2 border rounded">
+        <input id="mapel" placeholder="Mapel" class="p-2 border rounded">
+        <button onclick="simpanGuru()" class="bg-teal-600 text-white px-4 py-2 rounded">Simpan</button>
+      </div>
+      <div id="listGuru" class="mt-2"></div>
+    </div>
+
+    <div id="tab-nilai" class="tab hidden bg-white p-4 rounded shadow">Nilai</div>
+    <div id="tab-absensi" class="tab hidden bg-white p-4 rounded shadow">Absensi</div>
+
+    <!-- FORM PELANGGARAN + POINT -->
+    <div id="tab-pelanggaran" class="tab hidden bg-white p-4 rounded shadow">
+      <h2 class="font-bold mb-2">Catatan Pelanggaran + Point</h2>
+      <select id="nisPelanggaran" class="p-2 border rounded w-full mb-2"></select>
+      <input id="tanggalPelanggaran" type="date" class="p-2 border rounded w-full mb-2">
+      <input id="jenisPelanggaran" placeholder="Jenis Pelanggaran" class="p-2 border rounded w-full mb-2">
+      <input id="pointPelanggaran" placeholder="Point: 5" type="number" class="p-2 border rounded w-full mb-2">
+      <input id="sanksiPelanggaran" placeholder="Sanksi" class="p-2 border rounded w-full mb-2">
+      <textarea id="keteranganPelanggaran" placeholder="Keterangan" class="p-2 border rounded w-full mb-2"></textarea>
+      <button onclick="simpanPelanggaran()" class="bg-red-600 text-white px-4 py-2 rounded w-full">Simpan Pelanggaran</button>
+      <div id="listPelanggaran" class="mt-4"></div>
+    </div>
+  </div>
+
+  <footer id="footerPembuat" class="bg-gray-200 text-center text-sm p-3 mt-auto"></footer>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcq12UTLVrcLnwdzFtvBzCdx9tVYhZtcY-2P905PjhLfP9KsDzOJ9IkjCKCh-1Q6rf/exec"; // WAJIB GANTI
+const LOGO_URL = "https://ibb.co.com/bR1BnHQx"; // <-- GANTI INI
+const NAMA_PEMBUAT = "Adhien Costa"; // <-- GANTI INI
+
+let db = {siswa:[], guru:[], kelas:[], nilai:[], absensi:[], users:[], pelanggaran:[]};
+let currentUser = null; let chart = null;
+
+window.onload = async function(){
+  logoLogin.src = LOGO_URL;
+  logoHeader.src = LOGO_URL;
+  namaPembuatLogin.innerText = "Dibuat oleh: " + NAMA_PEMBUAT;
+  footerPembuat.innerText = "© 2026 SIMAPEL V3.0 | Dibuat oleh: " + NAMA_PEMBUAT + " | SMP IT Mutiara Hikmah";
+  await loadFromGSheet();
+  statusLoad.innerText = "Data siap. Silakan login";
+}
+
+async function loadFromGSheet(){
+  try{ let res = await fetch(SCRIPT_URL); db = await res.json(); }
+  catch(err){ statusLoad.innerText = "Gagal ambil data. Cek URL"; }
+}
+
+function login(){
+  let u = username.value; let p = password.value;
+  let user = db.users.find(x => x.user == u && x.pass == p);
+  if(user){
+    currentUser = user;
+    loginPage.classList.add('hidden');
+    mainApp.classList.remove('hidden');
+    userInfo.innerText = `Login: ${user.user}`;
+    if(user.role == 'admin') btnKelolaUser.classList.remove('hidden');
+    showTab('dashboard');
+  } else { loginError.innerText = "Username/Password salah"; }
+}
+
+function showTab(tab){
+  document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
+  document.getElementById('tab-'+tab).classList.remove('hidden');
+  if(tab=='dashboard') renderDashboard();
+  if(tab=='statistik') renderStatistik();
+  if(tab=='pelanggaran') loadDropdownPelanggaran();
+  renderList(tab);
+}
+
+// FITUR INPUT MANUAL BALIK
+function simpanKelas(){ db.kelas.push({kode:kodeKelas.value, wali:waliKelas.value}); renderList('kelas'); }
+function simpanSiswa(){ db.siswa.push({nis:nis.value, nama:namaSiswa.value, kelas:kelasSiswa.value}); renderList('siswa'); }
+function simpanGuru(){ db.guru.push({nip:nip.value, nama:namaGuru.value, mapel:mapel.value}); renderList('guru'); }
+function simpanPelanggaran(){
+  let nis = nisPelanggaran.value; let siswa = db.siswa.find(s=>s.nis == nis);
+  db.pelanggaran.push({nis, nama:siswa.nama, kelas:siswa.kelas, tanggal:tanggalPelanggaran.value, jenis_pelanggaran:jenisPelanggaran.value, point:pointPelanggaran.value, sanksi:sanksiPelanggaran.value, keterangan:keteranganPelanggaran.value});
+  alert("Tersimpan"); renderList('pelanggaran');
+}
+
+function renderList(type){
+  let el = document.getElementById('list'+type.charAt(0).toUpperCase()+type.slice(1));
+  if(el) el.innerHTML = db[type].map(d=>`<div class="border-b py-1 text-sm">${JSON.stringify(d)}</div>`).join('');
+}
+function renderDashboard(){
+  let siswa = currentUser.akses == 'semua'? db.siswa : db.siswa.filter(s=>s.kelas == currentUser.akses);
+  totalSiswa.innerText = siswa.length; totalGuru.innerText = db.guru.length; totalKelas.innerText = db.kelas.length;
+}
+function loadDropdownPelanggaran(){ nisPelanggaran.innerHTML = db.siswa.map(s=>`<option value="${s.nis}">${s.nis} - ${s.nama}</option>`).join(''); }
+function renderStatistik(){
+  let ctx = document.getElementById('chartPelanggaran').getContext('2d');
+  let dataChart = {}; db.pelanggaran.forEach(p=>{ dataChart[p.jenis_pelanggaran] = (dataChart[p.jenis_pelanggaran]||0) + 1; });
+  if(chart) chart.destroy();
+  chart = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(dataChart), datasets:[{label:'Jumlah', data:Object.values(dataChart), backgroundColor:'red'}] } });
+}
+async function syncToGoogleSheet(){ let payload = ['kelas','siswa','guru','nilai','absensi','users','pelanggaran'].map(t => ({type:t, data:db[t]})); for(let p of payload){ await fetch(SCRIPT_URL, {method:"POST", mode:"no-cors", body:JSON.stringify(p)}); } alert("Upload Selesai!"); }
+function exportData(){ let a = document.createElement('a'); a.href = "data:text/json," + encodeURIComponent(JSON.stringify(db)); a.download = "backup.json"; a.click(); }
+function importData(event){ let file = event.target.files[0]; let reader = new FileReader(); reader.onload = function(e){ db = JSON.parse(e.target.result); alert("Import Berhasil!"); } reader.readAsText(file); }
+function logout(){ location.reload(); }
+</script>
+</body>
+</html>
