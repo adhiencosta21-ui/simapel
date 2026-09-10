@@ -138,8 +138,8 @@ let db = {siswa:[], guru:[], kelas:[], nilai:[], absensi:[], users:[], pelanggar
 let currentUser = null; let chart = null;
 
 window.onload = async function(){
-  logoLogin.src = LOGO_URL;
-  logoHeader.src = LOGO_URL;
+  // logoLogin.src = LOGO_URL;  <-- HAPUS/COMMENT INI
+  // logoHeader.src = LOGO_URL; <-- HAPUS/COMMENT INI
   namaPembuatLogin.innerText = "Dibuat oleh: " + NAMA_PEMBUAT;
   footerPembuat.innerText = "© 2026 SIMAPEL V3.0 | Dibuat oleh: " + NAMA_PEMBUAT + " | SMP IT Mutiara Hikmah";
   await loadFromGSheet();
