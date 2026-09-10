@@ -126,9 +126,9 @@
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwORC9w1ITQyIWFtNjxh5c2mIr1p_h9b9utUYisOU-0JyXf18_XUp7g8N2iOzr3P4cH/exec";
-const LOGO_URL = "https://i.ibb.co.com/Hp7zQNB0/LOGO-MHI.jpg"; // INI YG BARU
-const NAMA_PEMBUAT = "Adhien Costa";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRheOnjZpDfPvhZ3oICHLThmK8RXR1paxORzNfNSIlgl7QkvS_fOeFCkDkimlzr_2X/exec"; // WAJIB GANTI
+const LOGO_URL = "https://i.ibb.co.com/Hp7zQNB0/LOGO-MHI.jpg"; // <-- GANTI INI
+const NAMA_PEMBUAT = "Adhien Costa"; // <-- GANTI INI
 
 let db = {siswa:[], guru:[], kelas:[], nilai:[], absensi:[], users:[], pelanggaran:[]};
 let currentUser = null; let chart = null;
@@ -143,10 +143,17 @@ window.onload = async function(){
 }
 
 async function loadFromGSheet(){
-  try{ let res = await fetch(SCRIPT_URL); db = await res.json(); }
-  catch(err){ statusLoad.innerText = "Gagal ambil data. Cek URL"; }
+  try{ 
+    let res = await fetch(SCRIPT_URL + "?action=getAll"); 
+    let text = await res.text();
+    db = JSON.parse(text); 
+    statusLoad.innerText = "Data siap. Silakan login";
+  }
+  catch(err){ 
+    console.log(err);
+    statusLoad.innerText = "Gagal ambil data. Cek Deploy Appscript ke Anyone"; 
+  }
 }
-
 function login(){
   let u = username.value; let p = password.value;
   let user = db.users.find(x => x.user == u && x.pass == p);
