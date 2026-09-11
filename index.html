@@ -137,8 +137,7 @@ const NAMA_PEMBUAT = "Adhien Costa"; // <-- GANTI INI
 let db = {siswa:[], guru:[], kelas:[], nilai:[], absensi:[], users:[], pelanggaran:[]};
 let currentUser = null; let chart = null;
 
-window.onload = async function(){
-  // logoLogin.src = LOGO_URL;  <-- HAPUS/COMMENT INI
+document.getElementById('logo').src = LOGO_URL; // HAPUS/COMMENT INI KALAU GA ADA LOGO
   // logoHeader.src = LOGO_URL; <-- HAPUS/COMMENT INI
   namaPembuatLogin.innerText = "Dibuat oleh: " + NAMA_PEMBUAT;
   footerPembuat.innerText = "© 2026 SIMAPEL V3.0 | Dibuat oleh: " + NAMA_PEMBUAT + " | SMP IT Mutiara Hikmah";
